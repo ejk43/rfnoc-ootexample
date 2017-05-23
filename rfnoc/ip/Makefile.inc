@@ -1,0 +1,13 @@
+#
+# Copyright 2017 EJ Kreinar
+#
+
+include $(RFNOC_OOTEXAMPLE_DIR)/ip/complex_to_magphase_oot/Makefile.inc
+
+LIB_OOT_IP_XCI_SRCS = \
+$(LIB_IP_COMPLEX_TO_MAGPHASE_OOT_SRCS)
+
+LIB_OOT_IP_SYNTH_OUTPUTS = \
+$(LIB_IP_COMPLEX_TO_MAGPHASE_OOT_OUTS)
+
+LIB_IP_XCI_SRCS += $(LIB_OOT_IP_XCI_SRCS)

@@ -1,0 +1,1 @@
+add_subdirectory(noc_block_addsuboot_tb)add_subdirectory(noc_block_complextomagphase_tb)
