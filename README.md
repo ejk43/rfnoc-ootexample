@@ -12,26 +12,13 @@ The magic here is in the structure and formatting of the Makefile.inc "tree" thr
 
 ## Building uhd-fpga
 
-In order to link correctly to the uhd-fpga builds, a few minor uhd-fpga changes are required from the uhd-fpga fork here: https://github.com/ejk43/fpga/tree/new_oot_includes
+In your gnuradio source directory (next to uhd-fpga), checkout rfnoc-ootexample: `git clone git@github.com:ejk43/rfnoc-ootexample.git`
 
-This basically tells the overall project Makefile to include a new Makefile.OOT.inc, which is used to specify folders of OOT repositories and point to their sources. 
+The makefile changes required to build OOT modules with HLS have been mainlined into uhd-fpga-- you should be able to use uhd_image_builder.py and point to the rfnoc-ootexample repo to have all the blocks available to instantiate in your FPGA build.
 
-An example entry for Makefile.OOT.inc for this repo would be: 
+(if you hit problems, let me know: ejkreinar@gmail.com)
 
-```
-##################################################
-# Include OOT makefiles
-##################################################
-
-OOT_DIR = $(BASE_DIR)/../../../rfnoc-ootexample/rfnoc
-include $(OOT_DIR)/Makefile.inc
-```
-
-Then you can include IP from the rfnoc-ootexample folder in the rfnoc_ce_auto_inst file. 
-
-I have also edited uhd_image_builder.py to correctly format the Makefile.OOT.inc files based on provided include paths. I've *tried* to edit uhd_image_builder_gui.py, but I have not extensively tested. 
-
-Anyway, you can run "make E310_RFNOC" or other commands as usual. 
+If you want to use the HLS blocks, dont forget to append `HLS` to your make call (e.g., make E310_RFNOC_HLS)
 
 
 ## Simulating HLS
