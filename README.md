@@ -6,11 +6,44 @@ This lets you add portable functionality to your RFNOC OOT build including:
  - Vivado IP
  - HLS
 
-The repo includes example IP and HLS. The examples should work in both simulation (rfnoc/testbenches) and when building to target e300 or x300 (in uhd-fpga/usrp3/top/XXXX).
+This repo includes example makefiles for both Xilinx IP (.xci files) and Xilinx HLS. The examples should work in both simulation (rfnoc/testbenches) and when building to target e300 or x300 (in uhd-fpga/usrp3/top/XXXX).
 
-The magic here is in the structure and formatting of the Makefile.inc "tree" throughout the rfnoc directories in order to properly build necessary FPGA sources. I've mostly modeled this after the uhd-fpga structure, so it's really quite similar, but still requires some manual editing in the OOT modules at this point (I have not edited rfnocmodtool, though that would be quite nice to get to that point....)
+The magic here is in the structure and formatting of the Makefile.inc "tree" throughout the rfnoc directories in order to properly build necessary FPGA sources. I've mostly modeled this after the uhd-fpga structure, so it's really quite similar, but still requires some manual editing in the OOT modules at this point.
 
-## Building uhd-fpga
+#### Requirements
+
+1. Vivado 2015.4
+2. [uhd-fpga](https://github.com/ettusresearch/fpga): The `vivado-2015.4` branch of rfnoc-ootexample is compatible with uhd-fpga up to and including commit [434943bf1a](https://github.com/ettusresearch/fpga/commits/434943bf1a) -- basically the commit before Vivado 2017.4 was merged into rfnoc-devel.
+
+NOTE: For vivado 2017.4 compatibility, see the master branch. 
+
+## Simulating OOT noc_blocks
+
+Make sure you have sourced the Vivado environment before running simulations (nominally something like `source  /opt/Xilinx/Vivado/2015.4/settings64.sh`)
+
+#### noc_block_complextomagphase
+
+Demonstrates OOT usage of Xilinx IP:
+
+```
+cd rfnoc/testbenches/noc_block_complextomagphase_tb
+make xsim
+```
+
+See the `rfnoc/ip` folder and subfolders for demonstration Makefiles to include IP in rfnoc builds
+
+#### noc_block_addsuboot
+
+Demonstrates OOT usage of Vivado HLS:
+
+```
+cd rfnoc/testbenches/noc_block_complextomagphase_tb
+make xsim_hls
+```
+
+See the `rfnoc/hls` folder and subfolders for demonstration Makefiles to include HLS in rfnoc builds
+
+## Building uhd-fpga with OOT noc_blocks
 
 In your gnuradio source directory (next to uhd-fpga), checkout rfnoc-ootexample: `git clone git@github.com:ejk43/rfnoc-ootexample.git`
 
@@ -19,16 +52,6 @@ The makefile changes required to build OOT modules with HLS have been mainlined 
 (if you hit problems, let me know: ejkreinar@gmail.com)
 
 If you want to use the HLS blocks, dont forget to append `HLS` to your make call (e.g., make E310_RFNOC_HLS)
-
-
-## Simulating HLS
-
-There's a few edits to the uhd-fpga repo needed to simulate HLS code. To get these edits, I have a uhd-fpga fork here: https://github.com/ejk43/fpga/tree/ejk/hls_testbench
-
-(For now, I've left these as separate forks online but I've applied the patches locally on my machine)
-
-After pulling these edits, it should be possible to successfully run "make xsim_hls" from the "rfnoc/testbenches/noc_block_addsuboot_tb" directory.
-
 
 ## Running on the FPGA
 
