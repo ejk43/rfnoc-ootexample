@@ -10,6 +10,5 @@ OOTEXAMPLE_HLS_DIR := $(OOT_DIR)/hls
 # Add HLS IP to build
 include $(OOTEXAMPLE_HLS_DIR)/addsub_oot/Makefile.inc
 
-hls_ip: $(HLS_IP_BUILD_TARGETS)
-
-.PHONY: hls_ip
+LIB_HLS_IP_SRCS += \
+$(HLS_IP_ADDSUB_HLS_OUTS)

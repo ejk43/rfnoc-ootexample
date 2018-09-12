@@ -27,7 +27,7 @@ include $(OOTEXAMPLE_HLS_DIR)/addsub_oot/Makefile.inc
 
 # Include makefile for HLS files 
 RFNOC_SRCS += $(abspath \
-$(HLS_IP_OUTPUT_SRCS) \
+$(HLS_IP_ADDSUB_OOT_HLS_OUTS) \
 )
 
 # Define only one toplevel module
