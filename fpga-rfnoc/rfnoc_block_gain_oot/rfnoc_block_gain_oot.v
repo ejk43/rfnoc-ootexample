@@ -7,7 +7,7 @@
 //
 // Description:
 //
-//   <Add block description here>
+//   Out of Tree example for a simple Gain block, RFNOC 4.0
 //
 // Parameters:
 //
@@ -185,13 +185,102 @@ module rfnoc_block_gain_oot #(
   // User Logic
   //---------------------------------------------------------------------------
 
-  // < Replace this section with your logic >
 
-  // Nothing to do yet, so just drive control signals to default values
-  assign m_ctrlport_resp_ack = 1'b0;
-  assign m_in_payload_tready = 1'b0;
-  assign m_in_context_tready = 1'b0;
-  assign s_out_payload_tvalid = 1'b0;
+  wire [ 8-1:0] set_addr;
+  wire [32-1:0] set_data;
+  wire  set_has_time;
+  wire  set_stb;
+  wire [ 8-1:0] rb_addr;
+  reg  [64-1:0] rb_data;
+
+  ctrlport_to_settings_bus # (
+    .NUM_PORTS (1)
+  ) ctrlport_to_settings_bus_i (
+    .ctrlport_clk             (ctrlport_clk),
+    .ctrlport_rst             (ctrlport_rst),
+    .s_ctrlport_req_wr        (m_ctrlport_req_wr),
+    .s_ctrlport_req_rd        (m_ctrlport_req_rd),
+    .s_ctrlport_req_addr      (m_ctrlport_req_addr),
+    .s_ctrlport_req_data      (m_ctrlport_req_data),
+    .s_ctrlport_req_has_time  (),
+    .s_ctrlport_req_time      (),
+    .s_ctrlport_resp_ack      (m_ctrlport_resp_ack),
+    .s_ctrlport_resp_data     (m_ctrlport_resp_data),
+    .set_data                 (set_data),
+    .set_addr                 (set_addr),
+    .set_stb                  (set_stb),
+    .set_time                 (),
+    .set_has_time             (set_has_time),
+    .rb_stb                   (1'b1),
+    .rb_addr                  (rb_addr),
+    .rb_data                  (rb_data));
+
+  localparam [7:0] SR_GAIN = 0;
+  localparam [7:0] RB_GAIN = 0;
+
+  wire [15:0] gain;
+  setting_reg #(
+    .my_addr(SR_GAIN), .awidth(8), .width(16))
+  sr_gain (
+    .clk(ctrlport_clk), .rst(ctrlport_rst),
+    .strobe(set_stb), .addr(set_addr), .in(set_data), .out(gain), .changed());
+
+  always @(posedge ctrlport_clk) begin
+     case(rb_addr)
+       8'd0 : rb_data <= {48'd0, gain};
+       default : rb_data <= 64'h0BADC0DE0BADC0DE;
+     endcase
+  end
+
+  wire [31:0] pipe_in_tdata;
+  wire pipe_in_tvalid, pipe_in_tlast;
+  wire pipe_in_tready;
+
+  wire [31:0] pipe_out_tdata;
+  wire pipe_out_tvalid, pipe_out_tlast;
+  wire pipe_out_tready;
+
+  // Adding FIFO to ensure Pipeline
+  axi_fifo_flop #(.WIDTH(32+1))
+  pipeline0_axi_fifo_flop (
+    .clk(axis_data_clk),
+    .reset(axis_data_rst),
+    .clear(1'b0),
+    .i_tdata({m_in_payload_tlast,m_in_payload_tdata}),
+    .i_tvalid(m_in_payload_tvalid),
+    .i_tready(m_in_payload_tready),
+    .o_tdata({pipe_in_tlast,pipe_in_tdata}),
+    .o_tvalid(pipe_in_tvalid),
+    .o_tready(pipe_in_tready));
+
+  wire [15:0] i = pipe_in_tdata[31:16];
+  wire [15:0] q = pipe_in_tdata[15:0];
+
+  wire [31:0] i_mult_gain = i*gain;
+  wire [31:0] q_mult_gain = q*gain;
+
+  wire [31:0] mult_gain = {i_mult_gain[15:0], q_mult_gain[15:0]};
+  axi_fifo_flop #(.WIDTH(32+1))
+  pipeline1_axi_fifo_flop (
+    .clk(axis_data_clk),
+    .reset(axis_data_rst),
+    .clear(1'b0),
+    .i_tdata({pipe_in_tlast,mult_gain}),
+    .i_tvalid(pipe_in_tvalid),
+    .i_tready(pipe_in_tready),
+    .o_tdata({pipe_out_tlast,pipe_out_tdata}),
+    .o_tvalid(pipe_out_tvalid),
+    .o_tready(pipe_out_tready));
+
+  /* Output Signals */
+  assign s_out_payload_tdata  = pipe_out_tdata;
+  assign s_out_payload_tkeep = 1'b1;
+  assign s_out_payload_tlast  = pipe_out_tlast;
+  assign s_out_payload_tvalid = pipe_out_tvalid;
+  assign pipe_out_tready = s_out_payload_tready;
+
+  // Drive other control signals to default values
+  assign m_in_context_tready = 1'b1;
   assign s_out_context_tvalid = 1'b0;
 
 endmodule // rfnoc_block_gain_oot

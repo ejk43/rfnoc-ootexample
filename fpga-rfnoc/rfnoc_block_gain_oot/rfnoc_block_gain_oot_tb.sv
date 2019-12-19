@@ -173,8 +173,43 @@ module rfnoc_block_gain_oot_tb;
     //--------------------------------
 
     // <Add your test code here>
-    test.start_test("<Name your first test", 10us);
-    `ASSERT_WARNING(0, "This testbench doesn't test anything yet!");
+    test.start_test("Validate gain_oot", 10us);
+    begin
+      chdr_word_t send_payload[$];
+      chdr_word_t recv_payload[$];
+      int gain, num_int16s, num_bytes;
+      logic signed [15:0] value, expected, index;
+      string s;
+      gain = 100;
+      num_int16s = 1000;
+
+      // Configure and send a "ramp" stimulus
+      blk_ctrl.reg_write(dut.SR_GAIN, gain);
+    //   send_payload = {};
+    //   for (int ii = 0; ii < num_int16s; ii = ii + 4) begin
+    //     value = ii;
+    //     send_payload.push_back({value+3, value+2, value+1, value+0});
+    //   end
+    //   blk_ctrl.send(0, send_payload, num_int16s*2);
+    //   blk_ctrl.recv(0, recv_payload, num_bytes);
+
+    //   // Check the length of the packet
+    //   `ASSERT_ERROR(
+    //     num_bytes == num_int16s*2,
+    //     "Received packet didn't have expected length"
+    //   );
+
+    //   // Check the gain output
+    //   for (int ii = 0; ii < num_int16s; ii = ii + 4) begin
+    //     for (int jj = 0; jj < 4; jj = jj + 4) begin
+    //       value = recv_payload[ii/4][0 +: 16];
+    //       index = ii + jj;
+    //       expected = gain * index;
+    //       $sformat(s, "Incorrect index: %0d! Expected: %0d, Received: %0d", index, expected, value);
+    //       `ASSERT_ERROR(value == expected, s);
+    //     end
+    //   end
+    end
     test.end_test();
 
     //--------------------------------

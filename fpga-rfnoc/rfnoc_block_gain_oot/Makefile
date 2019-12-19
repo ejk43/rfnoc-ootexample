@@ -16,6 +16,9 @@ BASE_DIR = $(UHD_FPGA_DIR)/usrp3/top
 # Include viv_sim_preample after defining BASE_DIR
 include $(BASE_DIR)/../tools/make/viv_sim_preamble.mak
 
+ARCH = zynq
+PART_ID = xc7z020/clg484/-1
+
 #-------------------------------------------------
 # Design Specific
 #-------------------------------------------------
