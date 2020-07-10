@@ -22,9 +22,10 @@ FIND_LIBRARY(
           /usr/local/lib64
           /usr/lib
           /usr/lib64
-)
+          )
+
+include("${CMAKE_CURRENT_LIST_DIR}/ootexampleTarget.cmake")
 
 INCLUDE(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(OOTEXAMPLE DEFAULT_MSG OOTEXAMPLE_LIBRARIES OOTEXAMPLE_INCLUDE_DIRS)
 MARK_AS_ADVANCED(OOTEXAMPLE_LIBRARIES OOTEXAMPLE_INCLUDE_DIRS)
-
